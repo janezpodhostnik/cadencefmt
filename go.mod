@@ -3,7 +3,7 @@ module github.com/janezpodhostnik/cadencefmt
 go 1.26.1
 
 require (
-	github.com/onflow/cadence v1.10.2
+	github.com/onflow/cadence v1.10.3-0.20260429190448-e93ac0133a52
 	github.com/spf13/cobra v1.10.2
 	github.com/turbolent/prettier v0.0.0-20220320183459-661cc755135d
 	go.lsp.dev/jsonrpc2 v0.10.0
@@ -14,6 +14,7 @@ require (
 require (
 	github.com/SaveTheRbtz/mph v0.1.1-0.20240117162131-4166ec7869bc // indirect
 	github.com/fxamacker/circlehash v0.3.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/logrusorgru/aurora/v4 v4.0.0 // indirect
 	github.com/segmentio/asm v1.1.3 // indirect
