@@ -4,7 +4,7 @@
 - [x] Phase 2: Comment scanner
 - [x] Phase 3: Comment attachment
 - [x] Phase 4: Comment interleaving in renderer
-- [ ] Phase 5: Rewrite passes (imports, modifiers, parens)
+- [x] Phase 5: Rewrite passes (imports, modifiers, parens)
 - [ ] Phase 6: Style overrides in renderer
 - [ ] Phase 7: CLI polish
 - [ ] Phase 8: Verify pass
