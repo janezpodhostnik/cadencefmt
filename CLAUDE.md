@@ -8,8 +8,6 @@ cadencefmt is a deterministic, idempotent formatter for the Cadence smart contra
 
 Module path: `github.com/janezpodhostnik/cadencefmt`
 
-The full technical specification is in `docs/cadencefmt-SPEC.md`. Implementation phasing and session-resumption protocol are in `docs/AGENT-PROMPT.md`. Check `PROGRESS.md` at repo root for which phases are complete.
-
 ## Architecture
 
 7-stage pipeline: parse -> scan comments -> attach comments -> rewrite AST -> render to Doc IR -> pretty-print -> verify round-trip.
@@ -18,11 +16,12 @@ The full technical specification is in `docs/cadencefmt-SPEC.md`. Implementation
 - **`internal/format/rewrite/`** - Sequential AST mutation passes (imports sorting, modifier ordering, redundant paren removal). Fixed order matters for idempotence.
 - **`internal/format/render/`** - Converts AST + CommentMap into `prettier.Doc` IR. Delegates to existing `ast.Element.Doc()` methods where possible, overrides for custom style rules. Comments interleaved via `CommentMap.Take()`.
 - **`internal/format/verify/`** - Re-parses formatted output and structurally compares ASTs. Safety net for correctness.
-- **`internal/config/`** - TOML config discovery (walk up dirs for `cadencefmt.toml`).
 - **`internal/lsp/`** - LSP server, `textDocument/formatting` only.
 - **`internal/diff/`** - Unified diff for `--check`/`--diff` output.
 
-Key dependency: `github.com/onflow/cadence` for parser/AST, `github.com/turbolent/prettier` for Wadler-style pretty-printing IR.
+Pipeline entry point: `format.Format()` in `internal/format/formatter.go` orchestrates all stages.
+
+Key dependencies: `github.com/onflow/cadence` for parser/AST, `github.com/turbolent/prettier` for Wadler-style pretty-printing IR, `github.com/spf13/cobra` for CLI.
 
 ## Hard Invariants
 
@@ -35,19 +34,15 @@ These must never be violated:
 ## Build & Development
 
 ```bash
-# Nix (canonical dev environment)
-nix develop                          # shell with Go 1.22, gopls, golangci-lint, goreleaser
-nix build                            # build binaries reproducibly
-nix flake check                      # run build checks
-
-# Standard Go
-go build ./cmd/cadencefmt
-go build ./cmd/cadencefmt-lsp
-go test ./...                        # all tests
-go test ./internal/format/trivia/    # single package
-go test ./internal/format/... -run TestSnapshot  # pattern match
-go test ./internal/format/... -update            # refresh golden files
-go test -fuzz FuzzFormat ./internal/format/      # fuzzing
+direnv allow                         # auto-loads nix dev shell (or: nix develop)
+just build                           # build both binaries
+just test                            # run all tests (fast, excludes corpus)
+just corpus                          # run corpus tests (requires submodule)
+just lint                            # golangci-lint
+just fuzz                            # fuzz for 60s per target
+just update-golden                   # refresh golden files
+just snapshot <name>                 # run a single snapshot test
+just check                           # build + test + lint
 ```
 
 ## Testing
@@ -57,7 +52,7 @@ go test -fuzz FuzzFormat ./internal/format/      # fuzzing
 - **Round-trip AST tests**: parse both input and output, structurally compare.
 - **Comment preservation**: multiset equality of comments between input and output.
 - **Fuzzing**: `FuzzFormat` (no panics on arbitrary bytes) and `FuzzRoundtrip` (idempotence + AST on valid inputs).
-- **Corpus tests**: `testdata/corpus/` contains real-world Flow contracts (git submodules). Must not crash, must be idempotent.
+- **Corpus tests**: `testdata/corpus/` contains real-world Flow contracts via git submodule (`flow-core-contracts`). `TestCorpus` checks format, idempotence, round-trip, and comment preservation. Skipped with `-short`. Run with `just corpus`.
 
 ## CLI Exit Codes
 
@@ -68,6 +63,14 @@ go test -fuzz FuzzFormat ./internal/format/      # fuzzing
 | 2 | Usage error (bad flags, missing input) |
 | 3 | Parse error in input |
 | 4 | Internal error (verify failed, orphaned comments) |
+
+## Default Formatting Options
+
+Line width: 100, indent: 4 spaces (no tabs), sort imports: yes, strip semicolons: yes, keep at most 1 blank line. Configured via `format.Options` in `internal/format/options.go`.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`): uses the Nix flake for environment setup (single source of truth for Go version and tools). Runs build, tests, corpus tests (`continue-on-error`), and fuzz on ubuntu-latest. Submodules checked out automatically.
 
 ## Key Design Decisions
 
@@ -94,5 +97,5 @@ The trivia scanner is the trickiest module. Key gotchas:
 - **"orphaned comments" error**: CommentMap has comments no render function called `Take()` for. Use the positions in the error to find which AST node type is missing a `wrapWithComments` call.
 - **Idempotence failure**: Format the output a second time and diff. The difference shows which construct isn't stable. Often caused by trailing whitespace, inconsistent blank line handling, or a Group that breaks differently on re-format.
 - **Round-trip failure**: AST of formatted output doesn't match the original. Diff the AST dumps. Usually means the renderer emits something the parser interprets differently (e.g., operator precedence changes when parens are removed).
-- **Comment in wrong position**: Print the CommentMap after attachment. Check the comment's source position falls within the expected node's range. The disambiguation heuristic (spec section 6.6) is usually the culprit.
+- **Comment in wrong position**: Print the CommentMap after attachment. Check the comment's source position falls within the expected node's range. The disambiguation heuristic in `trivia/attach.go` (which decides between trailing-of-previous vs leading-of-next when a comment sits between two nodes) is usually the culprit.
 - **Exploring the cadence AST**: Use `go doc github.com/onflow/cadence/ast`. The `ast.Walk` function and `ast.Element` interface are the main tools.
