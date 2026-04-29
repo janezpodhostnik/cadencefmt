@@ -124,7 +124,7 @@ func formatStdin() error {
 		return nil
 	}
 
-	os.Stdout.Write(out)
+	_, _ = os.Stdout.Write(out)
 	return nil
 }
 
@@ -170,13 +170,13 @@ func formatFile(path string) int {
 	}
 
 	// Without -w, print formatted output to stdout
-	os.Stdout.Write(out)
+	_, _ = os.Stdout.Write(out)
 	return 0
 }
 
 func walkDir(root string) int {
 	exitCode := 0
-	filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+	_ = filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			exitCode = 2

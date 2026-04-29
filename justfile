@@ -25,8 +25,8 @@ lint:
 
 # Run fuzz tests (default 60s per target)
 fuzz duration="60s":
-    go test -fuzz FuzzFormat -fuzztime={{ duration }} ./internal/format/
-    go test -fuzz FuzzRoundtrip -fuzztime={{ duration }} ./internal/format/
+    go test -fuzz FuzzFormat -fuzztime={{ duration }} -run '^$' ./internal/format/
+    go test -fuzz FuzzRoundtrip -fuzztime={{ duration }} -run '^$' ./internal/format/
 
 # Update golden test files
 update-golden:

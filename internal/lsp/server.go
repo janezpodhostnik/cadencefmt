@@ -69,8 +69,8 @@ func (s *Server) handleInitialize(_ context.Context, reply jsonrpc2.Replier, req
 		return reply(context.Background(), nil, err)
 	}
 
-	if params.RootURI != "" {
-		s.rootURI = string(params.RootURI)
+	if params.RootURI != "" { //nolint:staticcheck // RootURI is still sent by most clients
+		s.rootURI = string(params.RootURI) //nolint:staticcheck
 	}
 
 	result := protocol.InitializeResult{
