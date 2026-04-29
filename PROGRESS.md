@@ -9,5 +9,5 @@
 - [x] Phase 7: CLI polish
 - [x] Phase 8: Verify pass
 - [x] Phase 9: LSP server
-- [ ] Phase 10: Corpus testing and hardening
+- [x] Phase 10: Corpus testing and hardening
 - [ ] Phase 11: Nix flake and CI
