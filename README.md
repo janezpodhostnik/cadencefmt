@@ -77,43 +77,9 @@ These defaults are not configurable in v1:
 - Stripped semicolons
 - At most 1 consecutive blank line
 
-## Development
+## Contributing
 
-### Prerequisites
-
-Go 1.22+ or [Nix](https://nixos.org/).
-
-### Setup
-
-```bash
-# With Nix + direnv (recommended)
-direnv allow    # auto-loads the dev shell from flake.nix
-
-# Or manually
-nix develop
-```
-
-### Common Tasks
-
-```
-just build          # build both binaries
-just test           # run all tests (fast)
-just corpus         # run corpus tests against real-world contracts
-just lint           # golangci-lint
-just fuzz           # fuzz for 60s per target
-just update-golden  # refresh golden files after intentional changes
-just snapshot NAME  # run a single snapshot test
-just check          # build + test + lint
-```
-
-### Corpus Tests
-
-The test suite includes real-world contracts from [flow-core-contracts](https://github.com/onflow/flow-core-contracts) as a git submodule:
-
-```bash
-git submodule update --init
-just corpus
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing, and commit conventions.
 
 ## License
 
