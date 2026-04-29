@@ -10,4 +10,4 @@
 - [x] Phase 8: Verify pass
 - [x] Phase 9: LSP server
 - [x] Phase 10: Corpus testing and hardening
-- [ ] Phase 11: Nix flake and CI
+- [x] Phase 11: Nix flake and CI
