@@ -162,6 +162,47 @@ func TestCLI_NoVerify(t *testing.T) {
 	}
 }
 
+func TestCLI_MutuallyExclusiveFlags(t *testing.T) {
+	t.Parallel()
+	tmp := t.TempDir()
+	path := filepath.Join(tmp, "test.cdc")
+	if err := os.WriteFile(path, []byte("access(all) fun main() {}\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		name string
+		args []string
+	}{
+		{"check+write", []string{"-c", "-w", path}},
+		{"check+diff", []string{"-c", "-d", path}},
+		{"write+diff", []string{"-w", "-d", path}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			_, stderr, code := runCLI(t, "", tc.args...)
+			if code != 2 {
+				t.Fatalf("expected exit 2, got %d (stderr=%q)", code, stderr)
+			}
+			if !strings.Contains(stderr, "mutually exclusive") {
+				t.Errorf("expected 'mutually exclusive' in stderr, got: %q", stderr)
+			}
+		})
+	}
+}
+
+func TestCLI_StdinWithWrite(t *testing.T) {
+	t.Parallel()
+	_, stderr, code := runCLI(t, "access(all) fun main() {}\n", "-w")
+	if code != 2 {
+		t.Fatalf("expected exit 2 for stdin+--write, got %d", code)
+	}
+	if !strings.Contains(stderr, "stdin") {
+		t.Errorf("expected 'stdin' in stderr, got: %q", stderr)
+	}
+}
+
 func TestCLI_ParseError(t *testing.T) {
 	t.Parallel()
 	_, _, code := runCLI(t, "this is not valid cadence {{{{")

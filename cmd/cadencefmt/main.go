@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -53,6 +54,11 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string) error {
+	if err := validateFlags(len(args) == 0); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(2)
+	}
+
 	// No paths: read from stdin
 	if len(args) == 0 {
 		return formatStdin()
@@ -83,6 +89,24 @@ func run(cmd *cobra.Command, args []string) error {
 
 	if exitCode != 0 {
 		os.Exit(exitCode)
+	}
+	return nil
+}
+
+// validateFlags rejects mutually-exclusive flag combinations that would
+// otherwise produce surprising silent precedence behavior.
+func validateFlags(stdin bool) error {
+	if flagCheck && flagWrite {
+		return fmt.Errorf("flags --check and --write are mutually exclusive")
+	}
+	if flagCheck && flagDiff {
+		return fmt.Errorf("flags --check and --diff are mutually exclusive")
+	}
+	if flagWrite && flagDiff {
+		return fmt.Errorf("flags --write and --diff are mutually exclusive")
+	}
+	if stdin && flagWrite {
+		return fmt.Errorf("--write requires file paths; cannot be used with stdin input")
 	}
 	return nil
 }
@@ -134,7 +158,7 @@ func formatStdin() error {
 	out, err := format.Format(src, filename, formatOpts("."))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
-		if strings.Contains(err.Error(), "internal error") {
+		if errors.Is(err, format.ErrInternal) {
 			os.Exit(4)
 		}
 		os.Exit(3)
@@ -173,7 +197,7 @@ func formatFile(path string) int {
 	out, err := format.Format(src, path, formatOpts(filepath.Dir(path)))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", path, err)
-		if strings.Contains(err.Error(), "internal error") {
+		if errors.Is(err, format.ErrInternal) {
 			return 4
 		}
 		return 3
