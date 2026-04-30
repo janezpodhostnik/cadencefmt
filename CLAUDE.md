@@ -8,6 +8,8 @@ cadencefmt is a deterministic, idempotent formatter for the Cadence smart contra
 
 Module path: `github.com/janezpodhostnik/cadencefmt`
 
+Status: early version. The hard invariants below are non-negotiable, but novel formatting behavior on real-world contracts is still being shaken out — when in doubt, prefer adding a snapshot/corpus case over silently changing output. Most of the codebase was written with AI assistance; reviews lean on the test suite, so a change that passes corpus + idempotence + round-trip is the working bar for "safe".
+
 ## Architecture
 
 8-stage pipeline: parse -> scan comments -> attach comments -> rewrite AST -> render to Doc IR -> pretty-print -> post-process -> verify round-trip.
