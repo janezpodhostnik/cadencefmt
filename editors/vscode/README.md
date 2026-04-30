@@ -5,21 +5,34 @@ files using [`cadencefmt`](https://github.com/janezpodhostnik/cadencefmt) —
 a deterministic, idempotent formatter that preserves comments and verifies
 output via round-trip AST comparison.
 
-## Prerequisites
+## Install
 
-- The official **Cadence** extension
-  ([`onflow.cadence`](https://marketplace.visualstudio.com/items?itemName=onflow.cadence))
-  for syntax highlighting and the `cadence` language id this extension
-  binds to.
-- The `cadencefmt-lsp` binary on your PATH, installed via Go:
+The recommended path is the **one-line installer** (macOS / Linux), which
+fetches the binary and the extension from the latest GitHub Release:
 
-  ```bash
-  go install github.com/janezpodhostnik/cadencefmt/cmd/cadencefmt-lsp@latest
-  ```
+```bash
+curl -fsSL https://raw.githubusercontent.com/janezpodhostnik/cadencefmt/main/install.sh | bash
+```
 
-  This places the binary in `$(go env GOPATH)/bin` (typically `~/go/bin`
-  on macOS/Linux, `%USERPROFILE%\go\bin` on Windows). Make sure that
-  directory is on your PATH, or set `cadencefmt.path` (see Settings below).
+The script auto-detects `code` / `cursor` / `codium` / `code-insiders` and
+installs into the first one it finds. Re-run to upgrade. Windows is not
+currently supported.
+
+### Manual install
+
+Download the `.vsix` and the right `cadencefmt-lsp-<os>-<arch>` binary
+from the latest [GitHub Release](https://github.com/janezpodhostnik/cadencefmt/releases/latest).
+Drop the binary on your PATH, then:
+
+```bash
+code --install-extension cadencefmt.vsix
+```
+
+### Prerequisites
+
+- The official [Cadence](https://marketplace.visualstudio.com/items?itemName=onflow.cadence)
+  extension (`onflow.cadence`) — registers the `cadence` language id this
+  extension binds to.
 
 ## Usage
 
@@ -44,6 +57,7 @@ Palette.
 |---------|---------|-------------|
 | `cadencefmt.path` | `cadencefmt-lsp` | Path or command for the `cadencefmt-lsp` binary. |
 | `cadencefmt.trace.server` | `off` | LSP traffic verbosity: `off`, `messages`, or `verbose`. Output appears in the **cadencefmt** output channel. |
+| `cadencefmt.checkForUpdates` | `true` | Check GitHub Releases at most once per day for a new version and show a one-time notification. Set to `false` to disable. |
 
 ## Troubleshooting
 

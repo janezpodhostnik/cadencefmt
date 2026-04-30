@@ -121,7 +121,20 @@ just vscode-package     # builds the .vsix
 just vscode-install     # builds and installs into your local VS Code
 ```
 
-The extension is published to the VS Code Marketplace by pushing a tag matching `vscode/v*` (e.g. `vscode/v0.1.1`); CI verifies the tag matches `editors/vscode/package.json`'s `version` and runs `vsce publish`. Manual `vsce publish` is also supported when needed.
+## Releases
+
+Distribution is via [GitHub Releases](https://github.com/janezpodhostnik/cadencefmt/releases) only — no marketplace. Each release ships:
+
+- `cadencefmt` and `cadencefmt-lsp` binaries cross-compiled for `linux/{amd64,arm64}` and `darwin/{amd64,arm64}` (Windows not built).
+- `cadencefmt.vsix` — the VS Code extension.
+
+Cutting a release:
+
+1. Bump `editors/vscode/package.json` version. The Go binary's version is set from the git tag at build time; keep the two aligned.
+2. Commit, then push a tag `vX.Y.Z` matching that version (e.g. `git tag v0.1.1 && git push origin v0.1.1`).
+3. CI (`.github/workflows/release.yml`) verifies the tag matches `package.json`, builds all artifacts, and creates the GitHub Release with auto-generated notes. No tokens or secrets needed.
+
+The extension's auto-update check polls the GitHub Releases API at most once per day and prompts users to download a new version when one is available.
 
 ## Reporting Issues
 

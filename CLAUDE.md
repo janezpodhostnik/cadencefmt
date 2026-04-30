@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 cadencefmt is a deterministic, idempotent formatter for the Cadence smart contract language (Flow blockchain). It produces two binaries: `cadencefmt` (CLI, stdin/stdout filter) and `cadencefmt-lsp` (LSP server for editor integration). Written in Go, no CGO.
 
-A thin TypeScript VS Code extension lives in `editors/vscode/` — it spawns `cadencefmt-lsp` via `vscode-languageclient` so end users don't need a third-party generic LSP client. Build-time only; no runtime Node dependency in the Go path.
+A thin TypeScript VS Code extension lives in `editors/vscode/` — it spawns `cadencefmt-lsp` via `vscode-languageclient` so end users don't need a third-party generic LSP client. Build-time only; no runtime Node dependency in the Go path. Distribution is GitHub Releases only (binaries + `.vsix`); we don't publish to the VS Code Marketplace. Tag `vX.Y.Z` triggers `.github/workflows/release.yml`, which cross-compiles binaries for `linux/{amd64,arm64}` + `darwin/{amd64,arm64}`, builds the `.vsix`, and creates the release. The repo-root `install.sh` is the documented user-facing install path.
 
 Module path: `github.com/janezpodhostnik/cadencefmt`
 

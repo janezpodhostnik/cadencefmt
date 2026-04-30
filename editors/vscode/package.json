@@ -44,6 +44,11 @@
           "enum": ["off", "messages", "verbose"],
           "default": "off",
           "description": "Verbosity of LSP traffic logged to the cadencefmt output channel."
+        },
+        "cadencefmt.checkForUpdates": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check GitHub Releases at most once per day for a new version and show a one-time notification when one is available."
         }
       }
     },

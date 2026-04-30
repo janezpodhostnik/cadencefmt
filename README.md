@@ -31,6 +31,28 @@ Deterministic, idempotent formatter for the [Cadence](https://cadence-lang.org/)
 
 ## Installation
 
+### One-line installer (macOS / Linux)
+
+Installs the `cadencefmt` and `cadencefmt-lsp` binaries plus the VS Code
+extension. Re-run to upgrade.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/janezpodhostnik/cadencefmt/main/install.sh | bash
+```
+
+The script downloads from the latest [GitHub Release](https://github.com/janezpodhostnik/cadencefmt/releases/latest)
+and detects `code` / `cursor` / `codium` / `code-insiders` automatically.
+Set `PREFIX=/some/dir` to control where binaries land (default `~/.local/bin`).
+
+### Manual install
+
+Pre-built binaries (macOS and Linux on amd64 and arm64) and the VS Code
+extension `.vsix` are attached to every [GitHub Release](https://github.com/janezpodhostnik/cadencefmt/releases/latest).
+Pick the right binary for your platform, drop it on `PATH`, then install
+the extension via `code --install-extension cadencefmt.vsix`.
+
+### Build from source
+
 ```bash
 # Go
 go install github.com/janezpodhostnik/cadencefmt/cmd/cadencefmt@latest
@@ -39,17 +61,18 @@ go install github.com/janezpodhostnik/cadencefmt/cmd/cadencefmt-lsp@latest
 # Nix
 nix run github:janezpodhostnik/cadencefmt
 
-# Build from source
+# Clone + build
 git clone https://github.com/janezpodhostnik/cadencefmt.git
 cd cadencefmt
 go build ./cmd/cadencefmt
 go build ./cmd/cadencefmt-lsp
 ```
 
-For VS Code, install `cadencefmt-lsp` (Go method above) and then the
-[cadencefmt VS Code extension](https://marketplace.visualstudio.com/items?itemName=janezpodhostnik.cadencefmt).
-The extension wraps the LSP binary so no third-party generic LSP client is
-needed. Source: [`editors/vscode/`](editors/vscode/).
+### Windows
+
+Windows is not currently supported — no pre-built binary, no installer
+script. Building from source via `go build` should work, but the binaries
+are untested on Windows. Issues / PRs welcome.
 
 ## Usage
 
@@ -89,7 +112,7 @@ cadencefmt -w -- -unusual-name.cdc
 
 `cadencefmt-lsp` speaks [LSP](https://microsoft.github.io/language-server-protocol/) over stdio and supports `textDocument/formatting`.
 
-For **VS Code**, install the [cadencefmt extension](https://marketplace.visualstudio.com/items?itemName=janezpodhostnik.cadencefmt) — it spawns `cadencefmt-lsp` for you. For other editors, point any generic LSP client at the binary.
+For **VS Code** (and forks like Cursor / VSCodium), use the [one-line installer](#one-line-installer-macos--linux). For other editors, point any generic LSP client at the binary.
 
 ### Exit Codes
 
