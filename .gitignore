@@ -18,3 +18,8 @@ result-*
 # Fuzz cache
 testdata/fuzz/
 /.direnv
+
+# VS Code extension build artifacts
+/editors/vscode/node_modules/
+/editors/vscode/dist/
+/editors/vscode/*.vsix

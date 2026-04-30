@@ -46,6 +46,11 @@ go build ./cmd/cadencefmt
 go build ./cmd/cadencefmt-lsp
 ```
 
+For VS Code, install `cadencefmt-lsp` (Go method above) and then the
+[cadencefmt VS Code extension](https://marketplace.visualstudio.com/items?itemName=janezpodhostnik.cadencefmt).
+The extension wraps the LSP binary so no third-party generic LSP client is
+needed. Source: [`editors/vscode/`](editors/vscode/).
+
 ## Usage
 
 ```bash
@@ -82,7 +87,9 @@ cadencefmt -w -- -unusual-name.cdc
 
 ### LSP Server
 
-`cadencefmt-lsp` speaks [LSP](https://microsoft.github.io/language-server-protocol/) over stdio and supports `textDocument/formatting`. Point your editor's generic LSP client at it.
+`cadencefmt-lsp` speaks [LSP](https://microsoft.github.io/language-server-protocol/) over stdio and supports `textDocument/formatting`.
+
+For **VS Code**, install the [cadencefmt extension](https://marketplace.visualstudio.com/items?itemName=janezpodhostnik.cadencefmt) — it spawns `cadencefmt-lsp` for you. For other editors, point any generic LSP client at the binary.
 
 ### Exit Codes
 

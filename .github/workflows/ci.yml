@@ -37,3 +37,26 @@ jobs:
         run: |
           nix develop -c go test -fuzz FuzzFormat -fuzztime=60s ./internal/format/
           nix develop -c go test -fuzz FuzzRoundtrip -fuzztime=60s ./internal/format/
+
+  vscode-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: editors/vscode/package-lock.json
+
+      - name: Install dependencies
+        working-directory: editors/vscode
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: editors/vscode
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: editors/vscode
+        run: npm run build

@@ -111,6 +111,18 @@ Run `just corpus` to test against real-world contracts from [flow-core-contracts
 - Do not add new IR primitives to `turbolent/prettier` -- use the existing algebra
 - Rewrite pass order in `internal/format/rewrite/` is fixed -- do not reorder without bumping `CurrentFormatVersion` in `options.go`
 
+## VS Code Extension Development
+
+The thin TypeScript wrapper lives at [`editors/vscode/`](editors/vscode/). It spawns `cadencefmt-lsp` via `vscode-languageclient`. Node.js 22+ is required (or use `nix develop`, which provides it).
+
+```bash
+just vscode-build       # npm ci + typecheck + build (esbuild bundle)
+just vscode-package     # builds the .vsix
+just vscode-install     # builds and installs into your local VS Code
+```
+
+The extension is published to the VS Code Marketplace by pushing a tag matching `vscode/v*` (e.g. `vscode/v0.1.1`); CI verifies the tag matches `editors/vscode/package.json`'s `version` and runs `vsce publish`. Manual `vsce publish` is also supported when needed.
+
 ## Reporting Issues
 
 - Include the input `.cdc` source (or a minimal reproduction)

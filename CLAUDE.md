@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 cadencefmt is a deterministic, idempotent formatter for the Cadence smart contract language (Flow blockchain). It produces two binaries: `cadencefmt` (CLI, stdin/stdout filter) and `cadencefmt-lsp` (LSP server for editor integration). Written in Go, no CGO.
 
+A thin TypeScript VS Code extension lives in `editors/vscode/` — it spawns `cadencefmt-lsp` via `vscode-languageclient` so end users don't need a third-party generic LSP client. Build-time only; no runtime Node dependency in the Go path.
+
 Module path: `github.com/janezpodhostnik/cadencefmt`
 
 Status: early version. The hard invariants below are non-negotiable, but novel formatting behavior on real-world contracts is still being shaken out — when in doubt, prefer adding a snapshot/corpus case over silently changing output. Most of the codebase was written with AI assistance; reviews lean on the test suite, so a change that passes corpus + idempotence + round-trip is the working bar for "safe".

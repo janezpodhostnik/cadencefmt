@@ -52,6 +52,9 @@
             just
             git
             nixpkgs-fmt
+            # VS Code extension build (editors/vscode/)
+            nodejs_22
+            vsce
           ];
         };
 

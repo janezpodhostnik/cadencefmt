@@ -67,5 +67,17 @@ update-vendor-hash:
         echo "Updated vendorHash to ${real_hash}"
     fi
 
-# Run all checks (build, test, lint)
-check: build test lint
+# Build the VS Code extension (editors/vscode/)
+vscode-build:
+    cd editors/vscode && npm ci && npm run typecheck && npm run build
+
+# Package the VS Code extension into a .vsix
+vscode-package: vscode-build
+    cd editors/vscode && vsce package
+
+# Build, package, and install the VS Code extension into local VS Code
+vscode-install: vscode-package
+    code --install-extension $(ls -t editors/vscode/*.vsix | head -1)
+
+# Run all checks (build, test, lint, vscode build)
+check: build test lint vscode-build
