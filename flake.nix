@@ -18,7 +18,7 @@
             pname = "cadencefmt";
             inherit version;
             src = self;
-            vendorHash = "sha256-TSddUhoEa4J1xQKyHm9C/pI8S+zb13GkMm2pqXiBtig="; # update with: just update-vendor-hash
+            vendorHash = "sha256-Xbm4cnlaJSflQPoLvDVhvmvkQRL543LEvcYFYSMXNlk="; # update with: just update-vendor-hash
             subPackages = [ "cmd/cadencefmt" "cmd/cadencefmt-lsp" ];
             ldflags = [ "-s" "-w" "-X main.version=${version}" ];
             meta = with pkgs.lib; {
