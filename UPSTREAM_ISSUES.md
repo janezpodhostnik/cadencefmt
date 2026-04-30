@@ -47,6 +47,16 @@ return prettier.Group{
 
 ---
 
-## 3. `EntitlementMappingDeclaration.Doc()` missing `Group` wrapper
+## 3. `FunctionDocument()` adds spurious space before `()` in anonymous functions
+
+`FunctionDocument()` (used by `FunctionExpression.Doc()`) produces `fun (): Void { ... }` with a space between `fun` and `()`. This happens because the function uses `prettier.Line{}` after the access modifier position, and for anonymous functions with no access modifier, the `fun` keyword is followed by `Line{}` which becomes a space in flat mode.
+
+**Example**: `fun(): Void { ... }` → `fun (): Void { ... }`
+
+**Suggestion**: Skip the `Line{}` after `fun` when there is no access modifier.
+
+---
+
+## 4. `EntitlementMappingDeclaration.Doc()` missing `Group` wrapper
 
 The `HardLine` → `Line` fix (onflow/cadence#4485) was applied to the access modifier, but `EntitlementMappingDeclaration.Doc()` was not wrapped in a `prettier.Group{}` (unlike `EntitlementDeclaration.Doc()` which was). The body's `HardLine` elements cause the `Line` after the access modifier to break unconditionally. The elements inside the mapping body are also not wrapped in `Indent`.
