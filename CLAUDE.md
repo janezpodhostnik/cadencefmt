@@ -18,7 +18,8 @@ Post-processing (between pretty-print and verify), applied inside-out: `stripTra
 - **`internal/format/rewrite/`** - Sequential AST mutation passes (imports sorting, modifier ordering, redundant paren removal). Fixed order matters for idempotence.
 - **`internal/format/render/`** - Converts AST + CommentMap into `prettier.Doc` IR. Delegates to existing `ast.Element.Doc()` methods where possible, overrides for custom style rules. Comments interleaved via `CommentMap.Take()`. Accepts a `render.Context` for semicolon preservation. Key files: `decl.go` (declarations — functions, composites, interfaces, variables, transactions), `expr.go` (expressions — invocations, string templates), `render.go` (program entry, import grouping), `trivia.go` (comment wrapping, descendant comment draining), `context.go` (render context with semicolon set).
 - **`internal/format/verify/`** - Re-parses formatted output and structurally compares ASTs. Safety net for correctness.
-- **`internal/lsp/`** - LSP server, `textDocument/formatting` only.
+- **`internal/config/`** - TOML config file discovery and parsing. `Lookup()` walks up from a directory to find `.cadencefmt.toml`. `Config.Apply()` merges config onto `format.Options`. Precedence: defaults → config file → CLI flags.
+- **`internal/lsp/`** - LSP server, `textDocument/formatting` only. Loads config from workspace root on initialization.
 - **`internal/diff/`** - Unified diff for `--check`/`--diff` output.
 
 Pipeline entry point: `format.Format()` in `internal/format/formatter.go` orchestrates all stages.
@@ -98,7 +99,7 @@ just snapshot my-new-case
 
 ## Default Formatting Options
 
-Line width: 100, indent: 4 spaces (`IndentCharacter: " "`, `IndentCount: 4`; tabs supported), sort imports: yes, strip semicolons: yes (`StripSemicolons`, configurable), keep at most 1 blank line (`KeepBlankLines`, configurable). Format version: `"1"` (`FormatVersion`, validated on entry). Configured via `format.Options` in `internal/format/options.go`.
+Line width: 100, indent: 4 spaces (`IndentCharacter: " "`, `IndentCount: 4`; tabs supported), sort imports: yes, strip semicolons: yes (`StripSemicolons`), keep at most 1 blank line (`KeepBlankLines`). Format version: `"1"` (`FormatVersion`, validated on entry). Configured via `.cadencefmt.toml` or `format.Options` in `internal/format/options.go`. Precedence: defaults → config file → CLI flags.
 
 ## CI
 

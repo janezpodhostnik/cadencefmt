@@ -8,6 +8,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/janezpodhostnik/cadencefmt/internal/config"
 	"github.com/janezpodhostnik/cadencefmt/internal/format"
 	"go.lsp.dev/jsonrpc2"
 	"go.lsp.dev/protocol"
@@ -19,6 +20,7 @@ type Server struct {
 	mu   sync.Mutex
 	docs map[protocol.DocumentURI]string
 	conn jsonrpc2.Conn
+	cfg  config.Config
 }
 
 // NewServer creates a new LSP server.
@@ -67,6 +69,23 @@ func (s *Server) handleInitialize(_ context.Context, reply jsonrpc2.Replier, req
 	var params protocol.InitializeParams
 	if err := json.Unmarshal(req.Params(), &params); err != nil {
 		return reply(context.Background(), nil, err)
+	}
+
+	// Load config from workspace root if available.
+	// Try WorkspaceFolders first, then fall back to RootURI/RootPath.
+	var workspaceRoot string
+	if len(params.WorkspaceFolders) > 0 {
+		workspaceRoot = string(uri.URI(params.WorkspaceFolders[0].URI).Filename())
+	} else if params.RootURI != "" { //nolint:staticcheck // fallback for older clients
+		workspaceRoot = string(uri.URI(params.RootURI).Filename()) //nolint:staticcheck // fallback for older clients
+	} else if params.RootPath != "" { //nolint:staticcheck // fallback for older clients
+		workspaceRoot = params.RootPath //nolint:staticcheck // fallback for older clients
+	}
+	if workspaceRoot != "" {
+		cfg, _, err := config.Lookup(workspaceRoot)
+		if err == nil {
+			s.cfg = cfg
+		}
 	}
 
 	result := protocol.InitializeResult{
@@ -135,7 +154,8 @@ func (s *Server) handleFormatting(_ context.Context, reply jsonrpc2.Replier, req
 	}
 
 	filename := string(uri.URI(params.TextDocument.URI).Filename())
-	formatted, err := format.Format([]byte(text), filename, format.Default())
+	opts := s.cfg.Apply(format.Default())
+	formatted, err := format.Format([]byte(text), filename, opts)
 	if err != nil {
 		// Return empty edits on error — don't disrupt the editor
 		return reply(context.Background(), []protocol.TextEdit{}, nil)

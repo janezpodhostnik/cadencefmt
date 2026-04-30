@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/janezpodhostnik/cadencefmt/internal/config"
 	"github.com/janezpodhostnik/cadencefmt/internal/diff"
 	"github.com/janezpodhostnik/cadencefmt/internal/format"
 	"github.com/spf13/cobra"
@@ -22,6 +23,7 @@ var (
 	flagDiff          bool
 	flagNoVerify      bool
 	flagStdinFilename string
+	flagConfig        string
 )
 
 func main() {
@@ -43,6 +45,7 @@ func main() {
 	flags.BoolVarP(&flagDiff, "diff", "d", false, "Print unified diff of changes")
 	flags.BoolVar(&flagNoVerify, "no-verify", false, "Skip round-trip AST equivalence check")
 	flags.StringVar(&flagStdinFilename, "stdin-filename", "", "Filename for diagnostics when reading stdin")
+	flags.StringVar(&flagConfig, "config", "", "Path to config file (default: search for .cadencefmt.toml)")
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(2)
@@ -84,8 +87,30 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func formatOpts() format.Options {
+func formatOpts(basePath string) format.Options {
 	opts := format.Default()
+
+	// Load config: explicit --config flag or walk-up search
+	var cfg config.Config
+	if flagConfig != "" {
+		c, err := config.ParseFile(flagConfig)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(2)
+		}
+		cfg = c
+	} else if basePath != "" {
+		c, _, err := config.Lookup(basePath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error loading config: %v\n", err)
+			os.Exit(2)
+		}
+		cfg = c
+	}
+
+	opts = cfg.Apply(opts)
+
+	// CLI flags override config
 	opts.SkipVerify = flagNoVerify
 	return opts
 }
@@ -106,7 +131,7 @@ func formatStdin() error {
 		filename = flagStdinFilename
 	}
 
-	out, err := format.Format(src, filename, formatOpts())
+	out, err := format.Format(src, filename, formatOpts("."))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		if strings.Contains(err.Error(), "internal error") {
@@ -145,7 +170,7 @@ func formatFile(path string) int {
 		return 2
 	}
 
-	out, err := format.Format(src, path, formatOpts())
+	out, err := format.Format(src, path, formatOpts(filepath.Dir(path)))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", path, err)
 		if strings.Contains(err.Error(), "internal error") {

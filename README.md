@@ -54,6 +54,7 @@ cadencefmt -w -- -unusual-name.cdc
 | `-c`, `--check` | Exit 1 if any file would change; prints changed paths |
 | `-d`, `--diff` | Print unified diff instead of formatted source |
 | `--no-verify` | Skip round-trip AST verification |
+| `--config` | Path to config file (overrides `.cadencefmt.toml` search) |
 | `--stdin-filename` | Filename for diagnostics when reading stdin |
 | `-v`, `--version` | Print version and exit |
 
@@ -73,13 +74,30 @@ cadencefmt -w -- -unusual-name.cdc
 
 ## Formatting Style
 
-Defaults (not yet configurable via CLI flags):
+Defaults (configurable via `.cadencefmt.toml`):
 
-- 100-character line width (`LineWidth`, default: 100)
-- 4-space indentation (`IndentCharacter`: `" "`, `IndentCount`: 4; tabs supported)
-- Sorted imports
-- Stripped semicolons (`StripSemicolons`, default: true)
-- At most 1 consecutive blank line (`KeepBlankLines`, default: 1)
+- 100-character line width (`line_width`, default: 100)
+- 4-space indentation (`indent_character`: `" "`, `indent_count`: 4; tabs supported)
+- Sorted imports (`sort_imports`, default: true)
+- Stripped semicolons (`strip_semicolons`, default: true)
+- At most 1 consecutive blank line (`keep_blank_lines`, default: 1)
+
+## Configuration
+
+Create a `.cadencefmt.toml` in your project root:
+
+```toml
+line_width = 80
+indent_character = " "
+indent_count = 2
+sort_imports = true
+strip_semicolons = true
+keep_blank_lines = 1
+```
+
+The formatter searches for `.cadencefmt.toml` starting from the formatted file's directory, walking up to the filesystem root. All fields are optional — unset fields use defaults.
+
+Use `--config <path>` to specify an explicit config file.
 
 ## Performance
 

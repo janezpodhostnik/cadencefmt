@@ -202,3 +202,80 @@ func TestCLI_Directory(t *testing.T) {
 		t.Errorf("non-.cdc file was modified: %q", txt)
 	}
 }
+
+// --- Config file tests ---
+
+func TestCLI_ConfigFile(t *testing.T) {
+	t.Parallel()
+	tmp := t.TempDir()
+
+	// Create config with 2-space indent
+	cfgContent := "indent_count = 2\n"
+	if err := os.WriteFile(filepath.Join(tmp, ".cadencefmt.toml"), []byte(cfgContent), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a .cdc file with nested code
+	src := "access(all) fun main() {\nlet x = 1\n}\n"
+	cdcPath := filepath.Join(tmp, "test.cdc")
+	if err := os.WriteFile(cdcPath, []byte(src), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	stdout, _, code := runCLI(t, "", cdcPath)
+	if code != 0 {
+		t.Fatalf("expected exit 0, got %d", code)
+	}
+	// Should use 2-space indent from config
+	if !strings.Contains(stdout, "\n  let x") {
+		t.Errorf("expected 2-space indent from config, got:\n%s", stdout)
+	}
+}
+
+func TestCLI_ConfigFlag(t *testing.T) {
+	t.Parallel()
+	tmp := t.TempDir()
+
+	// Config in a non-standard location
+	cfgPath := filepath.Join(tmp, "custom-config.toml")
+	if err := os.WriteFile(cfgPath, []byte("indent_count = 3\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	src := "access(all) fun main() {\nlet x = 1\n}\n"
+	stdout, _, code := runCLI(t, src, "--config", cfgPath)
+	if code != 0 {
+		t.Fatalf("expected exit 0, got %d", code)
+	}
+	if !strings.Contains(stdout, "\n   let x") {
+		t.Errorf("expected 3-space indent from --config flag, got:\n%s", stdout)
+	}
+}
+
+func TestCLI_ConfigWalkUp(t *testing.T) {
+	t.Parallel()
+	tmp := t.TempDir()
+
+	// Config in parent dir
+	if err := os.WriteFile(filepath.Join(tmp, ".cadencefmt.toml"), []byte("indent_count = 2\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// File in child dir
+	child := filepath.Join(tmp, "contracts")
+	if err := os.MkdirAll(child, 0755); err != nil {
+		t.Fatal(err)
+	}
+	cdcPath := filepath.Join(child, "test.cdc")
+	if err := os.WriteFile(cdcPath, []byte("access(all) fun main() {\nlet x = 1\n}\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	stdout, _, code := runCLI(t, "", cdcPath)
+	if code != 0 {
+		t.Fatalf("expected exit 0, got %d", code)
+	}
+	if !strings.Contains(stdout, "\n  let x") {
+		t.Errorf("expected 2-space indent from parent config, got:\n%s", stdout)
+	}
+}

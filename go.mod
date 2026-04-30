@@ -4,6 +4,7 @@ go 1.26.1
 
 require (
 	github.com/onflow/cadence v1.10.3-0.20260430082153-048f0af284ae
+	github.com/pelletier/go-toml/v2 v2.3.0
 	github.com/spf13/cobra v1.10.2
 	github.com/turbolent/prettier v0.0.0-20220320183459-661cc755135d
 	go.lsp.dev/jsonrpc2 v0.10.0
