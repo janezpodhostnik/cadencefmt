@@ -7,6 +7,18 @@ Deterministic, idempotent formatter for the [Cadence](https://cadence-lang.org/)
 - Verifies correctness via round-trip AST comparison
 - Ships as a CLI (`cadencefmt`) and LSP server (`cadencefmt-lsp`)
 
+## Status
+
+> [!WARNING]
+> Early version — formatting works on the corpus we've tested, but you will likely
+> hit bugs on real-world code. Please [open an issue](https://github.com/janezpodhostnik/cadencefmt/issues)
+> with a minimal reproduction (input `.cdc` plus expected vs actual output).
+
+> [!NOTE]
+> Most of this codebase was written with AI assistance (Claude). Every change is
+> reviewed, tested against snapshot/corpus/round-trip suites, and gated on the
+> hard invariants documented in [CLAUDE.md](CLAUDE.md).
+
 ## Example
 
 <table>
