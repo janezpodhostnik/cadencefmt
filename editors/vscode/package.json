@@ -1,0 +1,75 @@
+{
+  "name": "cadencefmt",
+  "displayName": "cadencefmt",
+  "description": "Deterministic, idempotent formatter for the Cadence smart contract language.",
+  "version": "0.1.0",
+  "publisher": "janezpodhostnik",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "keywords": [
+    "cadence",
+    "flow",
+    "formatter",
+    "lsp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janezpodhostnik/cadencefmt.git",
+    "directory": "editors/vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/janezpodhostnik/cadencefmt/issues"
+  },
+  "homepage": "https://github.com/janezpodhostnik/cadencefmt#readme",
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onLanguage:cadence"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "cadencefmt",
+      "properties": {
+        "cadencefmt.path": {
+          "type": "string",
+          "default": "cadencefmt-lsp",
+          "description": "Path to the cadencefmt-lsp binary. May be a command resolved on PATH or an absolute path."
+        },
+        "cadencefmt.trace.server": {
+          "type": "string",
+          "enum": ["off", "messages", "verbose"],
+          "default": "off",
+          "description": "Verbosity of LSP traffic logged to the cadencefmt output channel."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "cadencefmt.formatDocument",
+        "title": "Format Document with cadencefmt",
+        "category": "cadencefmt"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --external:vscode --platform=node --target=node18 --outfile=dist/extension.js",
+    "watch": "esbuild src/extension.ts --bundle --external:vscode --platform=node --target=node18 --outfile=dist/extension.js --watch",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package",
+    "vscode:prepublish": "esbuild src/extension.ts --bundle --external:vscode --platform=node --target=node18 --outfile=dist/extension.js --minify"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0"
+  }
+}
