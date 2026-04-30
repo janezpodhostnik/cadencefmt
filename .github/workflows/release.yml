@@ -20,20 +20,15 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Version: $version"
 
-      - name: Verify tag matches editors/vscode/package.json
-        working-directory: editors/vscode
-        run: |
-          pkg_version=$(node -p "require('./package.json').version")
-          if [ "${{ steps.version.outputs.version }}" != "$pkg_version" ]; then
-            echo "Tag version (${{ steps.version.outputs.version }}) does not match editors/vscode/package.json version ($pkg_version)" >&2
-            exit 1
-          fi
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: editors/vscode/package-lock.json
+
+      - name: Stamp package.json version from tag
+        working-directory: editors/vscode
+        run: npm version "${{ steps.version.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Install dependencies
         working-directory: editors/vscode
