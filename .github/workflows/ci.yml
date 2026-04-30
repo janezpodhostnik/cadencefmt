@@ -20,6 +20,9 @@ jobs:
       - name: Build
         run: nix develop -c go build ./...
 
+      - name: Nix package build
+        run: nix build .#cadencefmt
+
       - name: Test
         run: nix develop -c go test -short ./... -v
 

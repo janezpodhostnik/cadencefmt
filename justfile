@@ -40,5 +40,20 @@ snapshot name:
 corpus:
     go test ./internal/format/ -run TestCorpus -v
 
+# Update vendorHash in flake.nix (run after changing go.mod)
+update-vendor-hash:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Use a fake hash to force nix to compute the real one
+    sed -i 's|vendorHash = ".*|vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";|' flake.nix
+    real_hash=$(nix build .#cadencefmt 2>&1 | grep 'got:' | awk '{print $2}') || true
+    if [ -z "$real_hash" ]; then
+        echo "nix build succeeded — vendorHash is already correct"
+        git checkout flake.nix
+    else
+        sed -i "s|vendorHash = \".*|vendorHash = \"${real_hash}\"; # update with: just update-vendor-hash|" flake.nix
+        echo "Updated vendorHash to ${real_hash}"
+    fi
+
 # Run all checks (build, test, lint)
 check: build test lint

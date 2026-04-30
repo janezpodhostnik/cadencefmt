@@ -12,7 +12,7 @@ Module path: `github.com/janezpodhostnik/cadencefmt`
 
 8-stage pipeline: parse -> scan comments -> attach comments -> rewrite AST -> render to Doc IR -> pretty-print -> post-process -> verify round-trip.
 
-Post-processing (between pretty-print and verify): `rejoinStringInterpolations` collapses line breaks inside `\(...)` template expressions; `stripTrailingLineWhitespace` removes indent from blank lines.
+Post-processing (between pretty-print and verify), applied inside-out: `stripTrailingLineWhitespace` removes indent from blank lines; `rejoinStringInterpolations` collapses line breaks inside `\(...)` template expressions; `collapseBlankLines` limits consecutive blank lines to `KeepBlankLines`.
 
 - **`internal/format/trivia/`** - Novel comment extraction. Hand-written lexer scans source bytes for comments (the `onflow/cadence` parser doesn't retain them in the AST). Attaches comments to AST nodes by position, producing a `CommentMap`. This is the most complex module.
 - **`internal/format/rewrite/`** - Sequential AST mutation passes (imports sorting, modifier ordering, redundant paren removal). Fixed order matters for idempotence.

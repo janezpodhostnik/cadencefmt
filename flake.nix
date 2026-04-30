@@ -18,7 +18,7 @@
             pname = "cadencefmt";
             inherit version;
             src = self;
-            vendorHash = null; # populate after first nix build
+            vendorHash = "sha256-TSddUhoEa4J1xQKyHm9C/pI8S+zb13GkMm2pqXiBtig="; # update with: just update-vendor-hash
             subPackages = [ "cmd/cadencefmt" "cmd/cadencefmt-lsp" ];
             ldflags = [ "-s" "-w" "-X main.version=${version}" ];
             meta = with pkgs.lib; {
@@ -49,7 +49,7 @@
             gopls
             gotools
             golangci-lint
-            goreleaser
+            just
             git
             nixpkgs-fmt
           ];
