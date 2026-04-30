@@ -40,6 +40,18 @@ snapshot name:
 corpus:
     go test ./internal/format/ -run TestCorpus -v
 
+# Run benchmarks (snapshot inputs only, no submodule needed)
+bench:
+    go test -bench=BenchmarkFormat -benchmem -count=3 -run='^$' ./internal/format/
+
+# Run all benchmarks including corpus and per-stage breakdown
+bench-all:
+    go test -bench=. -benchmem -count=3 -run='^$' ./internal/format/
+
+# Run per-stage breakdown benchmarks only
+bench-stages:
+    go test -bench=BenchmarkStage -benchmem -count=3 -run='^$' ./internal/format/
+
 # Update vendorHash in flake.nix (run after changing go.mod)
 update-vendor-hash:
     #!/usr/bin/env bash

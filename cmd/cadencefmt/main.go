@@ -84,6 +84,12 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func formatOpts() format.Options {
+	opts := format.Default()
+	opts.SkipVerify = flagNoVerify
+	return opts
+}
+
 func formatStdin() error {
 	src, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -100,7 +106,7 @@ func formatStdin() error {
 		filename = flagStdinFilename
 	}
 
-	out, err := format.Format(src, filename, format.Default())
+	out, err := format.Format(src, filename, formatOpts())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		if strings.Contains(err.Error(), "internal error") {
@@ -139,7 +145,7 @@ func formatFile(path string) int {
 		return 2
 	}
 
-	out, err := format.Format(src, path, format.Default())
+	out, err := format.Format(src, path, formatOpts())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", path, err)
 		if strings.Contains(err.Error(), "internal error") {

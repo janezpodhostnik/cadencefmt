@@ -41,6 +41,9 @@ cadencefmt -c contracts/
 
 # Show diff of formatting changes
 cadencefmt -d MyContract.cdc
+
+# Separate flags from paths starting with -
+cadencefmt -w -- -unusual-name.cdc
 ```
 
 ### Flags
@@ -48,10 +51,11 @@ cadencefmt -d MyContract.cdc
 | Flag | Description |
 |------|-------------|
 | `-w`, `--write` | Write formatted output back to the file |
-| `-c`, `--check` | Exit 1 if any file would change (no output) |
+| `-c`, `--check` | Exit 1 if any file would change; prints changed paths |
 | `-d`, `--diff` | Print unified diff instead of formatted source |
 | `--no-verify` | Skip round-trip AST verification |
 | `--stdin-filename` | Filename for diagnostics when reading stdin |
+| `-v`, `--version` | Print version and exit |
 
 ### LSP Server
 
@@ -69,13 +73,28 @@ cadencefmt -d MyContract.cdc
 
 ## Formatting Style
 
-Defaults (configurable via the Go API `format.Options`):
+Defaults (not yet configurable via CLI flags):
 
 - 100-character line width
 - 4-space indentation (no tabs)
 - Sorted imports
 - Stripped semicolons (`StripSemicolons`, default: true)
 - At most 1 consecutive blank line (`KeepBlankLines`, default: 1)
+
+## Performance
+
+Representative benchmark results formatting real-world Cadence contracts:
+
+| Input | Time | Throughput | Allocs |
+|-------|-----:|-----------:|-------:|
+| Snapshots (30 files, 4.8KB total) | 1.7ms | 2.9 MB/s | 20K |
+| Corpus small (<1KB, 183 files) | 42ms | 3.3 MB/s | 536K |
+| Corpus medium (1–10KB, 257 files) | 114ms | 3.9 MB/s | 1.4M |
+| Corpus large (>10KB, 46 files) | 219ms | 3.9 MB/s | 2.2M |
+| Largest file (110KB) | 35ms | 3.1 MB/s | 312K |
+
+> Measured on AMD Ryzen 9 3900X, Go 1.26.1, Linux. Numbers vary by hardware.
+> Reproduce: `just bench-all` (requires `git submodule update --init` for corpus).
 
 ## Contributing
 

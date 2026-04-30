@@ -47,6 +47,9 @@ just fuzz                            # fuzz for 60s per target
 just update-golden                   # refresh golden files
 just snapshot <name>                 # run a single snapshot test
 just check                           # build + test + lint
+just bench                           # benchmarks (snapshot inputs only)
+just bench-all                       # all benchmarks including corpus + per-stage
+just bench-stages                    # per-stage breakdown on largest file
 ```
 
 Direct Go equivalents for finer control:
@@ -55,6 +58,7 @@ Direct Go equivalents for finer control:
 go test ./internal/format/... -run "TestSnapshot/hello-world" -v   # single snapshot
 go test ./internal/format/ -run TestCorpus -v                      # corpus tests
 go test -fuzz FuzzFormat -fuzztime=120s -run '^$' ./internal/format/  # fuzz longer
+go test -bench=. -benchmem -count=3 -run='^$' ./internal/format/  # all benchmarks
 ```
 
 ## Testing
