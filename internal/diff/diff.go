@@ -83,6 +83,10 @@ func Unified(filename string, a, b string) string {
 		}
 	}
 
+	// Single-hunk diff: both files share identical context before the hunk,
+	// so start+1 is the correct starting line for both sides. If multi-hunk
+	// support is ever added, the new-file start must be tracked separately
+	// to account for cumulative insertions/deletions from earlier hunks.
 	fmt.Fprintf(&out, "@@ -%d,%d +%d,%d @@\n", start+1, aCount, start+1, bCount)
 	out.WriteString(hunks.String())
 	return out.String()

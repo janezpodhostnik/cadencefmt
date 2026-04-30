@@ -69,13 +69,13 @@ cadencefmt -d MyContract.cdc
 
 ## Formatting Style
 
-These defaults are not configurable in v1:
+Defaults (configurable via the Go API `format.Options`):
 
 - 100-character line width
 - 4-space indentation (no tabs)
 - Sorted imports
-- Stripped semicolons
-- At most 1 consecutive blank line
+- Stripped semicolons (`StripSemicolons`, default: true)
+- At most 1 consecutive blank line (`KeepBlankLines`, default: 1)
 
 ## Contributing
 

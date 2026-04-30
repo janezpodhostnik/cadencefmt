@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-[Nix](https://nixos.org/) is recommended (pins the exact Go version and tools). Alternatively, install Go 1.25+ and [golangci-lint](https://golangci-lint.run/) manually.
+[Nix](https://nixos.org/) is recommended (pins the exact Go version and tools). Alternatively, install Go 1.26+ and [golangci-lint](https://golangci-lint.run/) manually.
 
 ### Setup
 
@@ -109,7 +109,7 @@ Run `just corpus` to test against real-world contracts from [flow-core-contracts
 - All packages live under `internal/` -- there is no public Go API
 - Do not fork or modify the `onflow/cadence` parser -- use it as a library
 - Do not add new IR primitives to `turbolent/prettier` -- use the existing algebra
-- Rewrite pass order in `internal/format/rewrite/` is fixed -- do not reorder without bumping `format_version`
+- Rewrite pass order in `internal/format/rewrite/` is fixed -- do not reorder without bumping `CurrentFormatVersion` in `options.go`
 
 ## Reporting Issues
 

@@ -1,6 +1,7 @@
 package lsp
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -15,10 +16,9 @@ import (
 
 // Server implements a minimal LSP server that only handles textDocument/formatting.
 type Server struct {
-	mu       sync.Mutex
-	docs     map[protocol.DocumentURI]string
-	conn     jsonrpc2.Conn
-	rootURI  string
+	mu   sync.Mutex
+	docs map[protocol.DocumentURI]string
+	conn jsonrpc2.Conn
 }
 
 // NewServer creates a new LSP server.
@@ -69,13 +69,9 @@ func (s *Server) handleInitialize(_ context.Context, reply jsonrpc2.Replier, req
 		return reply(context.Background(), nil, err)
 	}
 
-	if params.RootURI != "" { //nolint:staticcheck // RootURI is still sent by most clients
-		s.rootURI = string(params.RootURI) //nolint:staticcheck
-	}
-
 	result := protocol.InitializeResult{
 		Capabilities: protocol.ServerCapabilities{
-			TextDocumentSync: protocol.TextDocumentSyncKindFull,
+			TextDocumentSync:           protocol.TextDocumentSyncKindFull,
 			DocumentFormattingProvider: true,
 		},
 	}
@@ -145,7 +141,7 @@ func (s *Server) handleFormatting(_ context.Context, reply jsonrpc2.Replier, req
 		return reply(context.Background(), []protocol.TextEdit{}, nil)
 	}
 
-	if string(formatted) == text {
+	if bytes.Equal(formatted, []byte(text)) {
 		return reply(context.Background(), []protocol.TextEdit{}, nil)
 	}
 

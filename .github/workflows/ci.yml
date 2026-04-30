@@ -23,6 +23,9 @@ jobs:
       - name: Test
         run: nix develop -c go test -short ./... -v
 
+      - name: Lint
+        run: nix develop -c golangci-lint run ./...
+
       - name: Corpus tests
         continue-on-error: true
         run: nix develop -c go test ./internal/format/ -run TestCorpus -v

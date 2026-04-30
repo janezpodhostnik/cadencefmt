@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/fs"
@@ -109,7 +110,7 @@ func formatStdin() error {
 	}
 
 	if flagCheck {
-		if string(src) != string(out) {
+		if !bytes.Equal(src, out) {
 			fmt.Fprintln(os.Stderr, filename)
 			os.Exit(1)
 		}
@@ -124,7 +125,10 @@ func formatStdin() error {
 		return nil
 	}
 
-	_, _ = os.Stdout.Write(out)
+	if _, err := os.Stdout.Write(out); err != nil {
+		fmt.Fprintf(os.Stderr, "error writing output: %v\n", err)
+		os.Exit(2)
+	}
 	return nil
 }
 
@@ -144,7 +148,7 @@ func formatFile(path string) int {
 		return 3
 	}
 
-	if string(src) == string(out) {
+	if bytes.Equal(src, out) {
 		return 0 // no changes
 	}
 
@@ -170,7 +174,10 @@ func formatFile(path string) int {
 	}
 
 	// Without -w, print formatted output to stdout
-	_, _ = os.Stdout.Write(out)
+	if _, err := os.Stdout.Write(out); err != nil {
+		fmt.Fprintf(os.Stderr, "error writing %s: %v\n", path, err)
+		return 2
+	}
 	return 0
 }
 

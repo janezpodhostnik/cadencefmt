@@ -10,11 +10,13 @@ Module path: `github.com/janezpodhostnik/cadencefmt`
 
 ## Architecture
 
-7-stage pipeline: parse -> scan comments -> attach comments -> rewrite AST -> render to Doc IR -> pretty-print -> verify round-trip.
+8-stage pipeline: parse -> scan comments -> attach comments -> rewrite AST -> render to Doc IR -> pretty-print -> post-process -> verify round-trip.
+
+Post-processing (between pretty-print and verify): `rejoinStringInterpolations` collapses line breaks inside `\(...)` template expressions; `stripTrailingLineWhitespace` removes indent from blank lines.
 
 - **`internal/format/trivia/`** - Novel comment extraction. Hand-written lexer scans source bytes for comments (the `onflow/cadence` parser doesn't retain them in the AST). Attaches comments to AST nodes by position, producing a `CommentMap`. This is the most complex module.
 - **`internal/format/rewrite/`** - Sequential AST mutation passes (imports sorting, modifier ordering, redundant paren removal). Fixed order matters for idempotence.
-- **`internal/format/render/`** - Converts AST + CommentMap into `prettier.Doc` IR. Delegates to existing `ast.Element.Doc()` methods where possible, overrides for custom style rules. Comments interleaved via `CommentMap.Take()`.
+- **`internal/format/render/`** - Converts AST + CommentMap into `prettier.Doc` IR. Delegates to existing `ast.Element.Doc()` methods where possible, overrides for custom style rules. Comments interleaved via `CommentMap.Take()`. Accepts a `render.Context` for semicolon preservation. Key files: `decl.go` (declarations — functions, composites, interfaces, variables, transactions), `expr.go` (expressions — invocations, string templates), `render.go` (program entry, import grouping), `trivia.go` (comment wrapping, descendant comment draining), `context.go` (render context with semicolon set).
 - **`internal/format/verify/`** - Re-parses formatted output and structurally compares ASTs. Safety net for correctness.
 - **`internal/lsp/`** - LSP server, `textDocument/formatting` only.
 - **`internal/diff/`** - Unified diff for `--check`/`--diff` output.
@@ -37,12 +39,22 @@ These must never be violated:
 direnv allow                         # auto-loads nix dev shell (or: nix develop)
 just build                           # build both binaries
 just test                            # run all tests (fast, excludes corpus)
-just corpus                          # run corpus tests (requires submodule)
+just test-pkg ./internal/format/trivia/  # run tests for a specific package
+just corpus                          # run corpus tests (requires submodule init)
 just lint                            # golangci-lint
+just fmt                             # go fmt ./...
 just fuzz                            # fuzz for 60s per target
 just update-golden                   # refresh golden files
 just snapshot <name>                 # run a single snapshot test
 just check                           # build + test + lint
+```
+
+Direct Go equivalents for finer control:
+
+```bash
+go test ./internal/format/... -run "TestSnapshot/hello-world" -v   # single snapshot
+go test ./internal/format/ -run TestCorpus -v                      # corpus tests
+go test -fuzz FuzzFormat -fuzztime=120s -run '^$' ./internal/format/  # fuzz longer
 ```
 
 ## Testing
@@ -53,6 +65,22 @@ just check                           # build + test + lint
 - **Comment preservation**: multiset equality of comments between input and output.
 - **Fuzzing**: `FuzzFormat` (no panics on arbitrary bytes) and `FuzzRoundtrip` (idempotence + AST on valid inputs).
 - **Corpus tests**: `testdata/corpus/` contains real-world Flow contracts via git submodules (`flow-core-contracts`, `flow-ft`, `flow-nft`). `TestCorpus` checks format, idempotence, round-trip, and comment preservation. Skipped with `-short`. Run with `just corpus`.
+
+### Adding a Snapshot Test
+
+```bash
+mkdir testdata/format/my-new-case
+# Write unformatted input
+cat > testdata/format/my-new-case/input.cdc << 'EOF'
+access(all) fun   example()  {  }
+EOF
+# Generate golden file
+just update-golden
+# Verify golden looks correct
+cat testdata/format/my-new-case/golden.cdc
+# Run just that test
+just snapshot my-new-case
+```
 
 ## CLI Exit Codes
 
@@ -66,11 +94,19 @@ just check                           # build + test + lint
 
 ## Default Formatting Options
 
-Line width: 100, indent: 4 spaces (no tabs), sort imports: yes, strip semicolons: yes, keep at most 1 blank line. Configured via `format.Options` in `internal/format/options.go`.
+Line width: 100, indent: 4 spaces (no tabs), sort imports: yes, strip semicolons: yes (`StripSemicolons`, configurable), keep at most 1 blank line (`KeepBlankLines`, configurable). Format version: `"1"` (`FormatVersion`, validated on entry). Configured via `format.Options` in `internal/format/options.go`.
 
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`): uses the Nix flake for environment setup (single source of truth for Go version and tools). Runs build, tests, corpus tests (`continue-on-error`), and fuzz on ubuntu-latest. Submodules checked out automatically.
+
+## Commit Conventions
+
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): `<type>(<scope>): <description>`
+
+Types: `fix`, `feat`, `refactor`, `test`, `docs`, `ci`, `chore`. Scope is the package name: `trivia`, `render`, `rewrite`, `verify`, `lsp`, `cli`.
+
+Examples: `fix(trivia): handle nested block comments inside string templates`, `test: add snapshot case for nil-coalescing in return statements`, `chore: bump onflow/cadence to v1.11.0`.
 
 ## Key Design Decisions
 
@@ -79,7 +115,7 @@ GitHub Actions (`.github/workflows/ci.yml`): uses the Nix flake for environment 
 - Deprecated `pub`/`priv` modifiers are preserved as-written, not rewritten.
 - String template interpolations `\(expr)` are not reformatted in v1.
 - All `internal/` packages are private by design. Public surface is CLI + LSP only.
-- Rewriter pass order is fixed and must not be reordered without bumping `format_version`.
+- Rewriter pass order is fixed and must not be reordered without bumping `CurrentFormatVersion` in `options.go`.
 - Do not fork or modify the `onflow/cadence` parser. Use it as a library only.
 - Do not add new IR primitives to `turbolent/prettier`. Use the existing algebra.
 
