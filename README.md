@@ -75,8 +75,8 @@ cadencefmt -w -- -unusual-name.cdc
 
 Defaults (not yet configurable via CLI flags):
 
-- 100-character line width
-- 4-space indentation (no tabs)
+- 100-character line width (`LineWidth`, default: 100)
+- 4-space indentation (`IndentCharacter`: `" "`, `IndentCount`: 4; tabs supported)
 - Sorted imports
 - Stripped semicolons (`StripSemicolons`, default: true)
 - At most 1 consecutive blank line (`KeepBlankLines`, default: 1)

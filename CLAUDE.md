@@ -98,7 +98,7 @@ just snapshot my-new-case
 
 ## Default Formatting Options
 
-Line width: 100, indent: 4 spaces (no tabs), sort imports: yes, strip semicolons: yes (`StripSemicolons`, configurable), keep at most 1 blank line (`KeepBlankLines`, configurable). Format version: `"1"` (`FormatVersion`, validated on entry). Configured via `format.Options` in `internal/format/options.go`.
+Line width: 100, indent: 4 spaces (`IndentCharacter: " "`, `IndentCount: 4`; tabs supported), sort imports: yes, strip semicolons: yes (`StripSemicolons`, configurable), keep at most 1 blank line (`KeepBlankLines`, configurable). Format version: `"1"` (`FormatVersion`, validated on entry). Configured via `format.Options` in `internal/format/options.go`.
 
 ## CI
 
