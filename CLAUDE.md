@@ -14,17 +14,17 @@ Module path: `github.com/janezpodhostnik/cadencefmt`
 
 Post-processing (between pretty-print and verify), applied inside-out: `stripTrailingLineWhitespace` removes indent from blank lines; `rejoinStringInterpolations` collapses line breaks inside `\(...)` template expressions; `collapseBlankLines` limits consecutive blank lines to `KeepBlankLines`.
 
-- **`internal/format/trivia/`** - Novel comment extraction. Hand-written lexer scans source bytes for comments (the `onflow/cadence` parser doesn't retain them in the AST). Attaches comments to AST nodes by position, producing a `CommentMap`. This is the most complex module.
-- **`internal/format/rewrite/`** - Sequential AST mutation passes (imports sorting, modifier ordering, redundant paren removal). Fixed order matters for idempotence.
+- **`internal/format/trivia/`** - Novel comment extraction. Hand-written lexer scans source bytes for comments (the `onflow/cadence` parser doesn't retain them in the AST). Attaches comments to AST nodes by position, producing a `CommentMap`. Also exposes `ScanSemicolons` to record explicit `;` positions when `StripSemicolons=false` (consumed by `render.Context`). This is the most complex module.
+- **`internal/format/rewrite/`** - Sequential AST mutation passes via the `Rewriter` interface in `rewrite.go`. Currently only `importsSorter` runs; modifier canonicalization is parser-enforced, paren removal is deferred. Pass order is fixed for idempotence.
 - **`internal/format/render/`** - Converts AST + CommentMap into `prettier.Doc` IR. Delegates to existing `ast.Element.Doc()` methods where possible, overrides for custom style rules. Comments interleaved via `CommentMap.Take()`. Accepts a `render.Context` for semicolon preservation. Key files: `decl.go` (declarations — functions, composites, interfaces, variables, transactions), `expr.go` (expressions — invocations, string templates), `render.go` (program entry, import grouping), `trivia.go` (comment wrapping, descendant comment draining), `context.go` (render context with semicolon set).
 - **`internal/format/verify/`** - Re-parses formatted output and structurally compares ASTs. Safety net for correctness.
 - **`internal/config/`** - TOML config file discovery and parsing. `Lookup()` walks up from a directory to find `.cadencefmt.toml`. `Config.Apply()` merges config onto `format.Options`. Precedence: defaults → config file → CLI flags.
 - **`internal/lsp/`** - LSP server, `textDocument/formatting` only. Loads config from workspace root on initialization.
 - **`internal/diff/`** - Unified diff for `--check`/`--diff` output.
 
-Pipeline entry point: `format.Format()` in `internal/format/formatter.go` orchestrates all stages.
+Pipeline entry point: `format.Format()` in `internal/format/formatter.go` orchestrates all stages. Binary entry points live in `cmd/cadencefmt/` (CLI) and `cmd/cadencefmt-lsp/` (LSP). All formatting logic is in `internal/`; there is no public Go API.
 
-Key dependencies: `github.com/onflow/cadence` for parser/AST, `github.com/turbolent/prettier` for Wadler-style pretty-printing IR, `github.com/spf13/cobra` for CLI.
+Key dependencies: `github.com/onflow/cadence` for parser/AST, `github.com/turbolent/prettier` for Wadler-style pretty-printing IR, `github.com/spf13/cobra` for CLI, `github.com/pelletier/go-toml/v2` for `.cadencefmt.toml`.
 
 ## Hard Invariants
 

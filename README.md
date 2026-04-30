@@ -7,6 +7,16 @@ Deterministic, idempotent formatter for the [Cadence](https://cadence-lang.org/)
 - Verifies correctness via round-trip AST comparison
 - Ships as a CLI (`cadencefmt`) and LSP server (`cadencefmt-lsp`)
 
+## Example
+
+<table>
+<tr><th>Before</th><th>After</th></tr>
+<tr>
+<td><img src="doc/assets/before.png" alt="Unformatted Cadence source" /></td>
+<td><img src="doc/assets/after.png" alt="Formatted Cadence source" /></td>
+</tr>
+</table>
+
 ## Installation
 
 ```bash
