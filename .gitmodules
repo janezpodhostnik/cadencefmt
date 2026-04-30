@@ -1,3 +1,9 @@
 [submodule "testdata/corpus/flow-core-contracts"]
 	path = testdata/corpus/flow-core-contracts
 	url = https://github.com/onflow/flow-core-contracts.git
+[submodule "testdata/corpus/flow-ft"]
+	path = testdata/corpus/flow-ft
+	url = https://github.com/onflow/flow-ft.git
+[submodule "testdata/corpus/flow-nft"]
+	path = testdata/corpus/flow-nft
+	url = https://github.com/onflow/flow-nft.git

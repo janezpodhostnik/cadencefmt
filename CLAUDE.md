@@ -52,7 +52,7 @@ just check                           # build + test + lint
 - **Round-trip AST tests**: parse both input and output, structurally compare.
 - **Comment preservation**: multiset equality of comments between input and output.
 - **Fuzzing**: `FuzzFormat` (no panics on arbitrary bytes) and `FuzzRoundtrip` (idempotence + AST on valid inputs).
-- **Corpus tests**: `testdata/corpus/` contains real-world Flow contracts via git submodule (`flow-core-contracts`). `TestCorpus` checks format, idempotence, round-trip, and comment preservation. Skipped with `-short`. Run with `just corpus`.
+- **Corpus tests**: `testdata/corpus/` contains real-world Flow contracts via git submodules (`flow-core-contracts`, `flow-ft`, `flow-nft`). `TestCorpus` checks format, idempotence, round-trip, and comment preservation. Skipped with `-short`. Run with `just corpus`.
 
 ## CLI Exit Codes
 
