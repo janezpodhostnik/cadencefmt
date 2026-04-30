@@ -36,8 +36,8 @@ github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWE
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/onflow/atree v0.16.0 h1:b+f/suzcnnr1Lx1KdJEjpn2CX+AKSAz1yIB30NQDutU=
 github.com/onflow/atree v0.16.0/go.mod h1:hiOT/vKK/Zyw34Ru9OFbfEemC5NnQ7SHFB43bN9/4qI=
-github.com/onflow/cadence v1.10.3-0.20260429190448-e93ac0133a52 h1:GydDacvNvTHGvmKR7V7AfdZKr5oJHT8uqZ4FITD+iUE=
-github.com/onflow/cadence v1.10.3-0.20260429190448-e93ac0133a52/go.mod h1:tyUNaYlAgeQVgfR2C38MI1dtFFjKay+yGGPMrCRc068=
+github.com/onflow/cadence v1.10.3-0.20260430082153-048f0af284ae h1:TXEwOncqofQf0WxIZBXQef93WT1luXcduSRmCA3ozWQ=
+github.com/onflow/cadence v1.10.3-0.20260430082153-048f0af284ae/go.mod h1:tyUNaYlAgeQVgfR2C38MI1dtFFjKay+yGGPMrCRc068=
 github.com/onflow/fixed-point v0.1.1 h1:j0jYZVO8VGyk1476alGudEg7XqCkeTVxb5ElRJRKS90=
 github.com/onflow/fixed-point v0.1.1/go.mod h1:gJdoHqKtToKdOZbvryJvDZfcpzC7d2fyWuo3ZmLtcGY=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
