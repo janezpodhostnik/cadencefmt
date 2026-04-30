@@ -2,7 +2,7 @@
   "name": "cadencefmt",
   "displayName": "cadencefmt",
   "description": "Deterministic, idempotent formatter for the Cadence smart contract language.",
-  "version": "1.0.2",
+  "version": "0.0.0",
   "publisher": "janezpodhostnik",
   "license": "Apache-2.0",
   "engines": {

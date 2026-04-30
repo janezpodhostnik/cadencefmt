@@ -130,9 +130,10 @@ Distribution is via [GitHub Releases](https://github.com/janezpodhostnik/cadence
 
 Cutting a release:
 
-1. Bump `editors/vscode/package.json` version. The Go binary's version is set from the git tag at build time; keep the two aligned.
-2. Commit, then push a tag `vX.Y.Z` matching that version (e.g. `git tag v0.1.1 && git push origin v0.1.1`).
-3. CI (`.github/workflows/release.yml`) verifies the tag matches `package.json`, builds all artifacts, and creates the GitHub Release with auto-generated notes. No tokens or secrets needed.
+1. Push a tag `vX.Y.Z` (e.g. `git tag v0.1.1 && git push origin v0.1.1`).
+2. CI (`.github/workflows/release.yml`) builds all artifacts and creates the GitHub Release with auto-generated notes. No tokens or secrets needed.
+
+The git tag is the single source of truth for the version. CI stamps the tag into `editors/vscode/package.json` at build time (so the `.vsix` manifest gets the right version) and injects it into the Go binaries via `-ldflags -X main.version=…`. The committed `package.json` value is just a placeholder for local development; do not bump it manually.
 
 The extension's auto-update check polls the GitHub Releases API at most once per day and prompts users to download a new version when one is available.
 
